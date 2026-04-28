@@ -199,8 +199,8 @@ class SettingsScreen extends StatelessWidget {
           TextButton(
             style: TextButton.styleFrom(foregroundColor: AppColors.error),
             onPressed: () async {
-              final storage = await _getStorage();
-              await storage.clearAll();
+              
+              
               Navigator.pop(context);
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('All data cleared')),
@@ -213,13 +213,9 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  Future<dynamic> _getStorage() async {
-    return await import_path_storage();
-  }
 }
 
 // Dummy import - replace with actual storage call
-Future import_path_storage() async {}
 
 class _SectionHeader extends StatelessWidget {
   final String title;

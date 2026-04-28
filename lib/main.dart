@@ -8,6 +8,7 @@ import 'core/utils/ad_service.dart';
 import 'presentation/controllers/app_controller.dart';
 import 'presentation/screens/home/home_screen.dart';
 import 'presentation/screens/pdf_preview/pdf_preview_screen.dart';
+import 'presentation/screens/pdf_preview/compress_pdf_screen.dart';
 import 'l10n/app_localizations.dart';
 
 void main() async {

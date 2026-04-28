@@ -46,6 +46,7 @@ dependencies:
   # Ads
   google_mobile_ads: ^5.1.0
   pdfrx: ^1.0.77
+  pdfrx: ^1.0.77
 
   # Utils
   uuid: ^4.4.0

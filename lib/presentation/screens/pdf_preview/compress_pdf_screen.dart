@@ -184,7 +184,7 @@ class _CompressPdfScreenState extends State<CompressPdfScreen> {
               activeColor: AppColors.primary,
               title: Text(isId ? e.value['labelId'] : e.value['labelEn']),
               subtitle: Text(e.value['desc']),
-              tileColor: sel ? AppColors.primary.withOpacity(0.05) : null,
+              tileColor: sel ? AppColors.primary.withValues(alpha: 0.05) : null,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             );
           }),
@@ -241,9 +241,9 @@ class _CompressPdfScreenState extends State<CompressPdfScreen> {
               width: double.infinity,
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: AppColors.success.withOpacity(0.08),
+                color: AppColors.success.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: AppColors.success.withOpacity(0.3)),
+                border: Border.all(color: AppColors.success.withValues(alpha: 0.3)),
               ),
               child: Column(children: [
                 const Icon(Icons.check_circle, color: AppColors.success, size: 40),
@@ -261,7 +261,7 @@ class _CompressPdfScreenState extends State<CompressPdfScreen> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: (_meetsTarget ? AppColors.success : AppColors.error).withOpacity(0.1),
+                    color: (_meetsTarget ? AppColors.success : AppColors.error).withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(

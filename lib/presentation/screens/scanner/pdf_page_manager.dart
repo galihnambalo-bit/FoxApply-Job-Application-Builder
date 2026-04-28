@@ -196,7 +196,7 @@ class _PdfPageManagerScreenState extends State<PdfPageManagerScreen> {
                       width: double.infinity,
                       padding: const EdgeInsets.symmetric(
                           horizontal: 16, vertical: 10),
-                      color: AppColors.primary.withOpacity(0.08),
+                      color: AppColors.primary.withValues(alpha: 0.08),
                       child: Text(
                         isId
                             ? 'Ketuk halaman untuk menandai yang akan dihapus'
@@ -327,7 +327,7 @@ class _PageThumbnailState extends State<_PageThumbnail> {
             Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(7),
-                color: AppColors.error.withOpacity(0.3),
+                color: AppColors.error.withValues(alpha: 0.3),
               ),
               child: const Center(
                 child: Icon(Icons.delete, color: Colors.white, size: 36),

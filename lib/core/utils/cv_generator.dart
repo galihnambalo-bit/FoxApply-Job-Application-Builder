@@ -385,7 +385,6 @@ class CVGenerator {
                 ),
               ),
               pw.Container(width: 100 * levelWidth,
-                widthFactor: levelWidth,
                 child: pw.Container(
                   height: 5,
                   decoration: pw.BoxDecoration(

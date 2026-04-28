@@ -86,7 +86,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
               groupValue: doc.filter,
               onChanged: (v) {
                 doc.filter = v!;
-                _ctrl.scannedDocs.refresh();
+                
                 _ctrl.saveScannedDocs();
                 Navigator.pop(context);
               },

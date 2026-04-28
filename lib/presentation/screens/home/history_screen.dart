@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:open_filex/open_filex.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../data/models/user_profile.dart';
+import '../../../data/models/user_profile.dart';
 import '../../controllers/app_controller.dart';
 
 class HistoryScreen extends StatelessWidget {

@@ -41,9 +41,6 @@ build/
 **/ios/Runner/GeneratedPluginRegistrant.*
 
 # Generated
-lib/l10n/app_localizations.dart
-lib/l10n/app_localizations_en.dart
-lib/l10n/app_localizations_id.dart
 
 # Keystore
 *.jks

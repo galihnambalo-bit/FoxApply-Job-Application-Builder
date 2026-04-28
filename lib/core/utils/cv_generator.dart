@@ -384,7 +384,7 @@ class CVGenerator {
                   borderRadius: pw.BorderRadius.circular(3),
                 ),
               ),
-              pw.FractionallySizedBox(
+              pw.Container(width: 100 * levelWidth,
                 widthFactor: levelWidth,
                 child: pw.Container(
                   height: 5,

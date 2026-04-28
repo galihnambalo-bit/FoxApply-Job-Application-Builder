@@ -1,4 +1,3 @@
-// lib/main.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:get/get.dart';
@@ -13,13 +12,8 @@ import 'l10n/app_localizations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  // Init AdMob
   await AdService.instance.initialize();
-
-  // Initialize GetX controller
   Get.put(AppController());
-
   runApp(const FoxApplyApp());
 }
 
@@ -29,37 +23,24 @@ class FoxApplyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ctrl = Get.find<AppController>();
-
     return Obx(() => GetMaterialApp(
           title: AppConstants.appName,
           debugShowCheckedModeBanner: false,
           theme: AppTheme.lightTheme,
-
-          // Localization
           locale: ctrl.locale,
           fallbackLocale: const Locale(AppConstants.langEn),
-          supportedLocales: const [
-            Locale('en'),
-            Locale('id'),
-          ],
+          supportedLocales: const [Locale('en'), Locale('id')],
           localizationsDelegates: const [
             AppLocalizations.delegate,
             GlobalMaterialLocalizations.delegate,
             GlobalWidgetsLocalizations.delegate,
             GlobalCupertinoLocalizations.delegate,
           ],
-
-          // Routes
           initialRoute: '/',
           getPages: [
-            GetPage(
-              name: '/',
-              page: () => const HomeScreen(),
-            ),
-            GetPage(
-              name: '/generate',
-              page: () => const GeneratePackageScreen(),
-            ),
+            GetPage(name: '/', page: () => const HomeScreen()),
+            GetPage(name: '/generate', page: () => const GeneratePackageScreen()),
+            GetPage(name: '/compress', page: () => CompressPdfScreen(pdfPath: Get.arguments ?? '')),
           ],
         ));
   }

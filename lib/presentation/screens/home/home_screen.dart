@@ -10,6 +10,7 @@ import '../settings/settings_screen.dart';
 import '../home/history_screen.dart';
 import '../../widgets/step_card.dart';
 import '../../widgets/banner_ad_widget.dart';
+import '../../widgets/fox_button.dart';
 import 'package:foxapply/l10n/app_localizations.dart';
 
 class HomeScreen extends StatefulWidget {

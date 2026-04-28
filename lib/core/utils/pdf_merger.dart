@@ -89,7 +89,6 @@ class PdfMerger {
     // Since we can't truly merge existing PDFs with pure dart pdf package,
     // we save all sections separately and combine via print/share
 
-    // Save placeholder
     final file = File(outputPath);
     await file.writeAsBytes(pdfPages.first);
     return outputPath;

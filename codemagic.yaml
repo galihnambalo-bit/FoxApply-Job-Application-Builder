@@ -1,0 +1,40 @@
+workflows:
+  android-workflow:
+    name: FoxApply Android Build
+    max_build_duration: 60
+    environment:
+      flutter: 3.27.0
+      java: 17
+    scripts:
+      - name: Download Poppins Fonts
+        script: |
+          mkdir -p assets/fonts
+          BASE="https://github.com/google/fonts/raw/main/ofl/poppins"
+          curl -fsSL "$BASE/Poppins-Regular.ttf"  -o assets/fonts/Poppins-Regular.ttf
+          curl -fsSL "$BASE/Poppins-Medium.ttf"   -o assets/fonts/Poppins-Medium.ttf
+          curl -fsSL "$BASE/Poppins-SemiBold.ttf" -o assets/fonts/Poppins-SemiBold.ttf
+          curl -fsSL "$BASE/Poppins-Bold.ttf"     -o assets/fonts/Poppins-Bold.ttf
+          echo "✅ Fonts downloaded"
+          ls -lh assets/fonts/
+      - name: Get Flutter packages
+        script: flutter pub get
+      - name: Generate localizations
+        script: flutter gen-l10n
+      - name: Build APK
+        script: |
+          flutter build apk --release \
+            --android-skip-build-dependency-validation
+      - name: Build AAB
+        script: |
+          flutter build appbundle --release \
+            --android-skip-build-dependency-validation
+    artifacts:
+      - build/app/outputs/flutter-apk/app-release.apk
+      - build/app/outputs/bundle/release/app-release.aab
+    publishing:
+      email:
+        recipients:
+          - galihnambalo@gmail.com
+        notify:
+          success: true
+          failure: true

@@ -1,0 +1,134 @@
+{
+  "@@locale": "en",
+  "appName": "FoxApply",
+  "@appName": {"description": "App name"},
+
+  "home": "Home",
+  "settings": "Settings",
+  "language": "Language",
+  "selectLanguage": "Select Language",
+  "english": "English",
+  "indonesian": "Bahasa Indonesia",
+
+  "createPackage": "Create Application Package",
+  "generateNow": "Generate Package",
+  "preview": "Preview",
+  "share": "Share",
+  "download": "Download",
+  "save": "Save",
+  "cancel": "Cancel",
+  "next": "Next",
+  "back": "Back",
+  "done": "Done",
+  "edit": "Edit",
+  "delete": "Delete",
+  "add": "Add",
+
+  "personalData": "Personal Data",
+  "fullName": "Full Name",
+  "email": "Email",
+  "phone": "Phone Number",
+  "address": "Address",
+  "city": "City",
+  "postalCode": "Postal Code",
+  "photo": "Photo",
+  "uploadPhoto": "Upload Photo",
+  "takePhoto": "Take Photo",
+  "chooseGallery": "Choose from Gallery",
+
+  "education": "Education",
+  "addEducation": "Add Education",
+  "institution": "Institution",
+  "degree": "Degree",
+  "major": "Major",
+  "graduationYear": "Graduation Year",
+  "gpa": "GPA",
+
+  "experience": "Work Experience",
+  "addExperience": "Add Experience",
+  "company": "Company",
+  "position": "Position",
+  "startDate": "Start Date",
+  "endDate": "End Date",
+  "currentlyWorking": "Currently working here",
+  "jobDescription": "Job Description",
+
+  "skills": "Skills",
+  "addSkill": "Add Skill",
+  "skillName": "Skill Name",
+  "skillLevel": "Skill Level",
+  "beginner": "Beginner",
+  "intermediate": "Intermediate",
+  "advanced": "Advanced",
+  "expert": "Expert",
+
+  "cvBuilder": "CV Builder",
+  "cvPreview": "CV Preview",
+  "selectTemplate": "Select Template",
+  "template1": "Modern",
+  "template2": "Professional",
+  "template3": "Creative",
+
+  "coverLetter": "Cover Letter",
+  "coverLetterBuilder": "Cover Letter Builder",
+  "targetPosition": "Target Position",
+  "targetCompany": "Target Company",
+  "letterDate": "Letter Date",
+  "letterContent": "Letter Content",
+  "generateLetter": "Generate Letter",
+
+  "scanner": "Document Scanner",
+  "scanDocument": "Scan Document",
+  "scanNew": "Scan New Document",
+  "retake": "Retake",
+  "usePhoto": "Use This Photo",
+  "cropAdjust": "Adjust Crop",
+  "applyFilter": "Apply Filter",
+  "filterOriginal": "Original",
+  "filterBW": "Black & White",
+  "filterEnhanced": "Enhanced",
+  "scannedDocs": "Scanned Documents",
+  "addDocument": "Add Document",
+  "reorderDocs": "Reorder Documents",
+
+  "pdfManager": "PDF Manager",
+  "mergedPDF": "Merged PDF",
+  "pageCount": "{count} pages",
+  "@pageCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "finalPackage": "Final Package",
+  "packageReady": "Your package is ready!",
+  "generating": "Generating your package...",
+  "pleaseWait": "Please wait...",
+
+  "errorRequired": "This field is required",
+  "errorEmail": "Please enter a valid email",
+  "errorPhone": "Please enter a valid phone number",
+  "errorNoPhoto": "Please upload a photo first",
+  "errorNoDocs": "Please scan at least one document",
+
+  "successGenerated": "Package generated successfully!",
+  "successSaved": "Saved successfully!",
+
+  "aboutApp": "About App",
+  "version": "Version",
+  "privacyPolicy": "Privacy Policy",
+  "termsOfService": "Terms of Service",
+
+  "profileSection": "Profile",
+  "jobSection": "Job Details",
+  "docsSection": "Documents",
+  "outputSection": "Output",
+
+  "step": "Step {current} of {total}",
+  "@step": {
+    "placeholders": {
+      "current": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  }
+}

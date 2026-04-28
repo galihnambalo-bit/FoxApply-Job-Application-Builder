@@ -1,0 +1,133 @@
+{
+  "@@locale": "id",
+  "appName": "FoxApply",
+
+  "home": "Beranda",
+  "settings": "Pengaturan",
+  "language": "Bahasa",
+  "selectLanguage": "Pilih Bahasa",
+  "english": "Bahasa Inggris",
+  "indonesian": "Bahasa Indonesia",
+
+  "createPackage": "Buat Paket Lamaran",
+  "generateNow": "Buat Paket",
+  "preview": "Pratinjau",
+  "share": "Bagikan",
+  "download": "Unduh",
+  "save": "Simpan",
+  "cancel": "Batal",
+  "next": "Lanjut",
+  "back": "Kembali",
+  "done": "Selesai",
+  "edit": "Edit",
+  "delete": "Hapus",
+  "add": "Tambah",
+
+  "personalData": "Data Diri",
+  "fullName": "Nama Lengkap",
+  "email": "Email",
+  "phone": "Nomor HP",
+  "address": "Alamat",
+  "city": "Kota",
+  "postalCode": "Kode Pos",
+  "photo": "Foto",
+  "uploadPhoto": "Unggah Foto",
+  "takePhoto": "Ambil Foto",
+  "chooseGallery": "Pilih dari Galeri",
+
+  "education": "Pendidikan",
+  "addEducation": "Tambah Pendidikan",
+  "institution": "Institusi",
+  "degree": "Jenjang",
+  "major": "Jurusan",
+  "graduationYear": "Tahun Lulus",
+  "gpa": "IPK",
+
+  "experience": "Pengalaman Kerja",
+  "addExperience": "Tambah Pengalaman",
+  "company": "Perusahaan",
+  "position": "Posisi",
+  "startDate": "Tanggal Mulai",
+  "endDate": "Tanggal Selesai",
+  "currentlyWorking": "Masih bekerja di sini",
+  "jobDescription": "Deskripsi Pekerjaan",
+
+  "skills": "Keahlian",
+  "addSkill": "Tambah Keahlian",
+  "skillName": "Nama Keahlian",
+  "skillLevel": "Tingkat Keahlian",
+  "beginner": "Pemula",
+  "intermediate": "Menengah",
+  "advanced": "Mahir",
+  "expert": "Ahli",
+
+  "cvBuilder": "Pembuat CV",
+  "cvPreview": "Pratinjau CV",
+  "selectTemplate": "Pilih Template",
+  "template1": "Modern",
+  "template2": "Profesional",
+  "template3": "Kreatif",
+
+  "coverLetter": "Surat Lamaran",
+  "coverLetterBuilder": "Pembuat Surat Lamaran",
+  "targetPosition": "Posisi yang Dilamar",
+  "targetCompany": "Nama Perusahaan",
+  "letterDate": "Tanggal Surat",
+  "letterContent": "Isi Surat",
+  "generateLetter": "Buat Surat",
+
+  "scanner": "Scanner Dokumen",
+  "scanDocument": "Scan Dokumen",
+  "scanNew": "Scan Dokumen Baru",
+  "retake": "Ulangi",
+  "usePhoto": "Gunakan Foto Ini",
+  "cropAdjust": "Atur Crop",
+  "applyFilter": "Terapkan Filter",
+  "filterOriginal": "Asli",
+  "filterBW": "Hitam & Putih",
+  "filterEnhanced": "Ditingkatkan",
+  "scannedDocs": "Dokumen Hasil Scan",
+  "addDocument": "Tambah Dokumen",
+  "reorderDocs": "Urutkan Dokumen",
+
+  "pdfManager": "Manajer PDF",
+  "mergedPDF": "PDF Gabungan",
+  "pageCount": "{count} halaman",
+  "@pageCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "finalPackage": "Paket Final",
+  "packageReady": "Paket lamaran Anda siap!",
+  "generating": "Sedang membuat paket...",
+  "pleaseWait": "Mohon tunggu...",
+
+  "errorRequired": "Kolom ini wajib diisi",
+  "errorEmail": "Masukkan email yang valid",
+  "errorPhone": "Masukkan nomor HP yang valid",
+  "errorNoPhoto": "Silakan unggah foto terlebih dahulu",
+  "errorNoDocs": "Silakan scan minimal satu dokumen",
+
+  "successGenerated": "Paket berhasil dibuat!",
+  "successSaved": "Berhasil disimpan!",
+
+  "aboutApp": "Tentang Aplikasi",
+  "version": "Versi",
+  "privacyPolicy": "Kebijakan Privasi",
+  "termsOfService": "Syarat Layanan",
+
+  "profileSection": "Profil",
+  "jobSection": "Detail Pekerjaan",
+  "docsSection": "Dokumen",
+  "outputSection": "Hasil",
+
+  "step": "Langkah {current} dari {total}",
+  "@step": {
+    "placeholders": {
+      "current": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  }
+}

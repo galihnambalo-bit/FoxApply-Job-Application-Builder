@@ -240,3 +240,86 @@ class ScannedDocument {
 }
 
 enum DocumentFilter { original, blackAndWhite, enhanced }
+
+// ── APPLICATION HISTORY ───────────────────────────────────
+class ApplicationHistory {
+  String id;
+  String companyName;
+  String position;
+  String date;
+  String status;
+  String pdfPath;
+  String notes;
+
+  ApplicationHistory({
+    required this.id,
+    required this.companyName,
+    required this.position,
+    required this.date,
+    this.status = 'sent',
+    this.pdfPath = '',
+    this.notes = '',
+  });
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'companyName': companyName,
+    'position': position,
+    'date': date,
+    'status': status,
+    'pdfPath': pdfPath,
+    'notes': notes,
+  };
+
+  factory ApplicationHistory.fromJson(Map<String, dynamic> json) =>
+      ApplicationHistory(
+        id: json['id'] ?? '',
+        companyName: json['companyName'] ?? '',
+        position: json['position'] ?? '',
+        date: json['date'] ?? '',
+        status: json['status'] ?? 'sent',
+        pdfPath: json['pdfPath'] ?? '',
+        notes: json['notes'] ?? '',
+      );
+
+  static const Map<String, String> statusLabel = {
+    'draft':     'Draft',
+    'sent':      'Terkirim',
+    'interview': 'Interview',
+    'rejected':  'Ditolak',
+    'accepted':  'Diterima ✅',
+  };
+}
+
+// ── CV PROFILE (Multi CV) ─────────────────────────────────
+class CVProfile {
+  String id;
+  String name;
+  String createdAt;
+  UserProfile profile;
+  int template;
+
+  CVProfile({
+    required this.id,
+    required this.name,
+    required this.profile,
+    this.template = 1,
+    String? createdAt,
+  }) : createdAt = createdAt ?? DateTime.now().toString().split(' ')[0];
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'name': name,
+    'createdAt': createdAt,
+    'profile': profile.toJson(),
+    'template': template,
+  };
+
+  factory CVProfile.fromJson(Map<String, dynamic> json) => CVProfile(
+    id: json['id'] ?? '',
+    name: json['name'] ?? '',
+    createdAt: json['createdAt'],
+    profile: UserProfile.fromJson(json['profile'] ?? {}),
+    template: json['template'] ?? 1,
+  );
+}

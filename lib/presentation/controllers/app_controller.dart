@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 import '../../core/constants/app_constants.dart';
 import '../../data/models/user_profile.dart';
 import '../../data/repositories/storage_repository.dart';
-import '../../data/models/user_profile.dart';
 
 class AppController extends GetxController {
   late StorageRepository _storage;

@@ -38,6 +38,9 @@ dependencies:
   # Ads
   google_mobile_ads: ^5.1.0
 
+  # QR Code
+  qr_flutter: ^4.1.0
+
   # Utils
   uuid: ^4.4.0
   get: ^4.6.6

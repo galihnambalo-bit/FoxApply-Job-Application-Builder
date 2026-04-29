@@ -121,7 +121,7 @@ class _PdfPageManagerScreenState extends State<PdfPageManagerScreen> {
                           color: selected ? Colors.white : AppColors.textPrimary),
                       onSelected: (_) {
                         widget.document.filter = f;
-                        _ctrl.scannedDocs.refresh();
+                        
                         _ctrl.saveDocsToStorage();
                         setState(() {});
                       },

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:uuid/uuid.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../data/models/user_profile.dart';
@@ -19,30 +20,83 @@ class _ScannerScreenState extends State<ScannerScreen> {
   final _ctrl = Get.find<AppController>();
   bool _isLoading = false;
 
-  Future<void> _pickImage(ImageSource source) async {
+  // Request permission dulu sebelum akses kamera/galeri
+  Future<bool> _requestCameraPermission() async {
+    final status = await Permission.camera.request();
+    if (status.isDenied || status.isPermanentlyDenied) {
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+            title: const Text('Izin Kamera'),
+            content: const Text(
+                'Izin kamera diperlukan untuk scan dokumen. '
+                'Buka pengaturan untuk mengizinkan akses kamera.'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Batal'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  openAppSettings();
+                },
+                child: const Text('Buka Pengaturan'),
+              ),
+            ],
+          ),
+        );
+      }
+      return false;
+    }
+    return status.isGranted;
+  }
+
+  Future<bool> _requestStoragePermission() async {
+    // Android 13+ pakai READ_MEDIA_IMAGES
+    if (Platform.isAndroid) {
+      final photos = await Permission.photos.request();
+      if (photos.isGranted) return true;
+      final storage = await Permission.storage.request();
+      return storage.isGranted;
+    }
+    return true;
+  }
+
+  Future<void> _pickCamera() async {
     if (!mounted) return;
+    
+    // Request permission kamera
+    final granted = await _requestCameraPermission();
+    if (!granted) return;
+
     setState(() => _isLoading = true);
     try {
       final file = await ImagePicker().pickImage(
-        source: source,
-        imageQuality: 80,
-        maxWidth: 1600,
-        maxHeight: 1600,
+        source: ImageSource.camera,
+        imageQuality: 85,
+        maxWidth: 1920,
+        maxHeight: 1920,
+        preferredCameraDevice: CameraDevice.rear,
       );
+      
       if (file == null) {
         if (mounted) setState(() => _isLoading = false);
         return;
       }
+
       _ctrl.addScannedDoc(ScannedDocument(
         id: const Uuid().v4(),
         imagePath: file.path,
         name: 'Dokumen ${_ctrl.scannedDocs.length + 1}',
         order: _ctrl.scannedDocs.length,
       ));
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('✅ Dokumen berhasil ditambahkan!'),
+            content: Text('✅ Foto berhasil ditambahkan!'),
             backgroundColor: AppColors.success,
           ),
         );
@@ -51,7 +105,65 @@ class _ScannerScreenState extends State<ScannerScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Gagal: ${e.toString().substring(0, e.toString().length.clamp(0, 100))}'),
+            content: Text('Error kamera: ${e.toString().length > 80 ? e.toString().substring(0, 80) : e}'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    }
+    if (mounted) setState(() => _isLoading = false);
+  }
+
+  Future<void> _pickGallery() async {
+    if (!mounted) return;
+
+    final granted = await _requestStoragePermission();
+    if (!granted) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Izin galeri diperlukan'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+      return;
+    }
+
+    setState(() => _isLoading = true);
+    try {
+      final file = await ImagePicker().pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 85,
+        maxWidth: 1920,
+        maxHeight: 1920,
+      );
+
+      if (file == null) {
+        if (mounted) setState(() => _isLoading = false);
+        return;
+      }
+
+      _ctrl.addScannedDoc(ScannedDocument(
+        id: const Uuid().v4(),
+        imagePath: file.path,
+        name: 'Dokumen ${_ctrl.scannedDocs.length + 1}',
+        order: _ctrl.scannedDocs.length,
+      ));
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('✅ Foto berhasil ditambahkan!'),
+            backgroundColor: AppColors.success,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error galeri: ${e.toString().length > 80 ? e.toString().substring(0, 80) : e}'),
             backgroundColor: AppColors.error,
           ),
         );
@@ -69,10 +181,12 @@ class _ScannerScreenState extends State<ScannerScreen> {
         allowedExtensions: ['pdf'],
         allowMultiple: true,
       );
+
       if (result == null || result.files.isEmpty) {
         if (mounted) setState(() => _isLoading = false);
         return;
       }
+
       for (final f in result.files) {
         if (f.path == null) continue;
         _ctrl.addScannedDoc(ScannedDocument(
@@ -82,10 +196,11 @@ class _ScannerScreenState extends State<ScannerScreen> {
           order: _ctrl.scannedDocs.length,
         ));
       }
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('✅ ${result.files.length} file ditambahkan!'),
+            content: Text('✅ ${result.files.length} PDF ditambahkan!'),
             backgroundColor: AppColors.success,
           ),
         );
@@ -93,7 +208,10 @@ class _ScannerScreenState extends State<ScannerScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e'), backgroundColor: AppColors.error),
+          SnackBar(
+            content: Text('Error PDF: $e'),
+            backgroundColor: AppColors.error,
+          ),
         );
       }
     }
@@ -107,23 +225,30 @@ class _ScannerScreenState extends State<ScannerScreen> {
       appBar: AppBar(
         title: Text(isId ? 'Dokumen' : 'Documents'),
         actions: [
-          // Tombol Refresh Manual
-          Obx(() => _ctrl.scannedDocs.isNotEmpty
-              ? IconButton(
-                  icon: const Icon(Icons.refresh),
-                  tooltip: isId ? 'Refresh' : 'Refresh',
-                  onPressed: () => setState(() {}),
-                )
-              : const SizedBox.shrink()),
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            tooltip: 'Refresh',
+            onPressed: () => setState(() {}),
+          ),
         ],
       ),
       body: Column(
         children: [
-          // Tombol upload
-          Padding(
+          // Tombol tambah
+          Container(
             padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.05),
+                  blurRadius: 4, offset: const Offset(0, 2),
+                ),
+              ],
+            ),
             child: Column(
               children: [
+                // Upload PDF
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton.icon(
@@ -133,7 +258,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
                         ? 'Upload PDF (Ijazah, KTP, Sertifikat)'
                         : 'Upload PDF (Diploma, ID, Certificate)'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.error,
+                      backgroundColor: const Color(0xFFC62828),
                       padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
                   ),
@@ -143,21 +268,17 @@ class _ScannerScreenState extends State<ScannerScreen> {
                   children: [
                     Expanded(
                       child: OutlinedButton.icon(
-                        onPressed: _isLoading
-                            ? null
-                            : () => _pickImage(ImageSource.camera),
+                        onPressed: _isLoading ? null : _pickCamera,
                         icon: const Icon(Icons.camera_alt, size: 18),
-                        label: Text(isId ? 'Kamera' : 'Camera'),
+                        label: Text(isId ? '📷 Kamera' : '📷 Camera'),
                       ),
                     ),
                     const SizedBox(width: 8),
                     Expanded(
                       child: OutlinedButton.icon(
-                        onPressed: _isLoading
-                            ? null
-                            : () => _pickImage(ImageSource.gallery),
+                        onPressed: _isLoading ? null : _pickGallery,
                         icon: const Icon(Icons.photo_library, size: 18),
-                        label: Text(isId ? 'Galeri' : 'Gallery'),
+                        label: Text(isId ? '🖼️ Galeri' : '🖼️ Gallery'),
                       ),
                     ),
                   ],
@@ -180,18 +301,18 @@ class _ScannerScreenState extends State<ScannerScreen> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(Icons.folder_open, size: 64,
-                          color: AppColors.textSecondary),
+                      const Text('📂', style: TextStyle(fontSize: 64)),
                       const SizedBox(height: 12),
                       Text(
                         isId ? 'Belum ada dokumen' : 'No documents yet',
-                        style: const TextStyle(color: AppColors.textSecondary),
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(color: AppColors.textSecondary),
                       ),
                       const SizedBox(height: 8),
                       Text(
                         isId
-                            ? 'Upload PDF atau ambil foto dokumen'
-                            : 'Upload PDF or take photo of document',
+                            ? 'Upload PDF atau foto dokumenmu di atas'
+                            : 'Upload PDF or take photo above',
                         style: const TextStyle(
                             color: AppColors.textSecondary, fontSize: 12),
                         textAlign: TextAlign.center,
@@ -202,7 +323,7 @@ class _ScannerScreenState extends State<ScannerScreen> {
               }
 
               return ListView.builder(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
+                padding: const EdgeInsets.all(12),
                 itemCount: docs.length,
                 itemBuilder: (_, i) {
                   final doc = docs[i];
@@ -210,24 +331,25 @@ class _ScannerScreenState extends State<ScannerScreen> {
                   return Card(
                     margin: const EdgeInsets.only(bottom: 8),
                     child: ListTile(
+                      onTap: () => Get.to(() => PdfPageManagerScreen(document: doc)),
                       leading: Container(
-                        width: 48, height: 48,
+                        width: 50, height: 50,
                         decoration: BoxDecoration(
-                          color: (isPdf ? AppColors.error : AppColors.primary)
-                              .withValues(alpha: 0.1),
+                          color: (isPdf
+                              ? const Color(0xFFC62828)
+                              : AppColors.primary).withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: isPdf
                             ? const Icon(Icons.picture_as_pdf,
-                                color: AppColors.error)
+                                color: Color(0xFFC62828))
                             : ClipRRect(
                                 borderRadius: BorderRadius.circular(8),
                                 child: Image.file(
                                   File(doc.imagePath),
                                   fit: BoxFit.cover,
                                   errorBuilder: (_, __, ___) => const Icon(
-                                      Icons.image,
-                                      color: AppColors.primary),
+                                      Icons.image, color: AppColors.primary),
                                 ),
                               ),
                       ),
@@ -235,16 +357,24 @@ class _ScannerScreenState extends State<ScannerScreen> {
                           style: const TextStyle(
                               fontWeight: FontWeight.w500, fontSize: 14)),
                       subtitle: Text(
-                          isPdf ? 'File PDF' : isId ? 'Foto Dokumen' : 'Document Photo',
-                          style: const TextStyle(fontSize: 12)),
-                      trailing: IconButton(
-                        icon: const Icon(Icons.delete_outline,
-                            color: AppColors.error),
-                        onTap: () => Get.to(() => PdfPageManagerScreen(document: doc)),
-                      trailing: IconButton(
-                        icon: const Icon(Icons.more_vert),
-                        onPressed: () => Get.to(() => PdfPageManagerScreen(document: doc)),
+                        isPdf
+                            ? 'PDF • ${isId ? "Ketuk untuk kelola" : "Tap to manage"}'
+                            : isId
+                                ? 'Foto • Ketuk untuk kelola'
+                                : 'Photo • Tap to manage',
+                        style: const TextStyle(fontSize: 11),
                       ),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.chevron_right,
+                              color: AppColors.textSecondary),
+                          IconButton(
+                            icon: const Icon(Icons.delete_outline,
+                                color: AppColors.error, size: 20),
+                            onPressed: () => _confirmDelete(context, doc.id, isId),
+                          ),
+                        ],
                       ),
                     ),
                   );
@@ -257,19 +387,18 @@ class _ScannerScreenState extends State<ScannerScreen> {
     );
   }
 
-  void _showDeleteDialog(BuildContext context, String id, bool isId) {
+  void _confirmDelete(BuildContext context, String id, bool isId) {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: Text(isId ? 'Hapus Dokumen?' : 'Delete Document?'),
+        title: Text(isId ? 'Hapus?' : 'Delete?'),
         content: Text(isId
-            ? 'Yakin ingin menghapus dokumen ini?'
+            ? 'Yakin hapus dokumen ini?'
             : 'Sure to delete this document?'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(isId ? 'Batal' : 'Cancel'),
-          ),
+              onPressed: () => Navigator.pop(context),
+              child: Text(isId ? 'Batal' : 'Cancel')),
           TextButton(
             style: TextButton.styleFrom(foregroundColor: AppColors.error),
             onPressed: () {

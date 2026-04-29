@@ -1,18 +1,16 @@
-// lib/presentation/screens/scanner/scanner_screen.dart
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:image_cropper/image_cropper.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:uuid/uuid.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../data/models/user_profile.dart';
 import '../../controllers/app_controller.dart';
-import 'package:foxapply/l10n/app_localizations.dart';
 
 class ScannerScreen extends StatefulWidget {
   const ScannerScreen({super.key});
-
   @override
   State<ScannerScreen> createState() => _ScannerScreenState();
 }
@@ -20,251 +18,229 @@ class ScannerScreen extends StatefulWidget {
 class _ScannerScreenState extends State<ScannerScreen> {
   final _ctrl = Get.find<AppController>();
   final _picker = ImagePicker();
+  bool _isLoading = false;
 
-  Future<void> _scanDocument(ImageSource source) async {
-    final file = await _picker.pickImage(
-      source: source,
-      imageQuality: 90,
-      preferredCameraDevice: CameraDevice.rear,
-    );
-    if (file == null) return;
+  Future<void> _pickImage(ImageSource source) async {
+    setState(() => _isLoading = true);
+    try {
+      final file = await _picker.pickImage(
+        source: source,
+        imageQuality: 85,
+        maxWidth: 1920,
+        maxHeight: 1920,
+      );
+      if (file == null) { setState(() => _isLoading = false); return; }
 
-    // Crop the image
-    final cropped = await ImageCropper().cropImage(
-      sourcePath: file.path,
-      aspectRatioPresets: [
-        CropAspectRatioPreset.original,
-        CropAspectRatioPreset.ratio4x3,
-      ],
-      uiSettings: [
-        AndroidUiSettings(
-          toolbarTitle: AppLocalizations.of(context)!.cropAdjust,
-          toolbarColor: AppColors.secondary,
-          toolbarWidgetColor: Colors.white,
-          activeControlsWidgetColor: AppColors.primary,
-          initAspectRatio: CropAspectRatioPreset.original,
-          lockAspectRatio: false,
-        ),
-      ],
-    );
+      final cropped = await ImageCropper().cropImage(
+        sourcePath: file.path,
+        uiSettings: [
+          AndroidUiSettings(
+            toolbarTitle: 'Sesuaikan',
+            toolbarColor: AppColors.secondary,
+            toolbarWidgetColor: Colors.white,
+            activeControlsWidgetColor: AppColors.primary,
+            lockAspectRatio: false,
+          ),
+        ],
+      );
 
-    if (cropped == null) return;
+      final finalPath = cropped?.path ?? file.path;
+      _ctrl.addScannedDoc(ScannedDocument(
+        id: const Uuid().v4(),
+        imagePath: finalPath,
+        name: 'Dokumen ${_ctrl.scannedDocs.length + 1}',
+        order: _ctrl.scannedDocs.length,
+      ));
 
-    final doc = ScannedDocument(
-      id: const Uuid().v4(),
-      imagePath: cropped.path,
-      name: 'Document ${_ctrl.scannedDocs.length + 1}',
-      order: _ctrl.scannedDocs.length,
-    );
-
-    _ctrl.addScannedDoc(doc);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('✅ Dokumen berhasil ditambahkan!'),
+              backgroundColor: AppColors.success),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e'), backgroundColor: AppColors.error),
+        );
+      }
+    }
+    if (mounted) setState(() => _isLoading = false);
   }
 
-  void _showFilterDialog(ScannedDocument doc) {
-    final l = AppLocalizations.of(context)!;
+  Future<void> _pickPDF() async {
+    setState(() => _isLoading = true);
+    try {
+      final result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['pdf'],
+        allowMultiple: true,
+      );
+      if (result == null) { setState(() => _isLoading = false); return; }
+
+      for (final f in result.files) {
+        if (f.path == null) continue;
+        _ctrl.addScannedDoc(ScannedDocument(
+          id: const Uuid().v4(),
+          imagePath: f.path!,
+          name: f.name.replaceAll('.pdf', ''),
+          order: _ctrl.scannedDocs.length,
+        ));
+      }
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('✅ ${result.files.length} PDF ditambahkan!'),
+            backgroundColor: AppColors.success,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e'), backgroundColor: AppColors.error),
+        );
+      }
+    }
+    if (mounted) setState(() => _isLoading = false);
+  }
+
+  void _deleteDoc(String id) {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: Text(l.applyFilter),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: DocumentFilter.values.map((f) {
-            String label;
-            switch (f) {
-              case DocumentFilter.original:
-                label = l.filterOriginal;
-                break;
-              case DocumentFilter.blackAndWhite:
-                label = l.filterBW;
-                break;
-              case DocumentFilter.enhanced:
-                label = l.filterEnhanced;
-                break;
-            }
-            return RadioListTile<DocumentFilter>(
-              value: f,
-              groupValue: doc.filter,
-              onChanged: (v) {
-                doc.filter = v!;
-                
-                _ctrl.saveScannedDocs();
-                Navigator.pop(context);
-              },
-              title: Text(label),
-              activeColor: AppColors.primary,
-            );
-          }).toList(),
-        ),
+        title: const Text('Hapus Dokumen?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Batal')),
+          TextButton(
+            style: TextButton.styleFrom(foregroundColor: AppColors.error),
+            onPressed: () { _ctrl.removeScannedDoc(id); Navigator.pop(context); },
+            child: const Text('Hapus'),
+          ),
+        ],
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final l = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l.scanner),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.help_outline),
-            onPressed: () => _showHelp(context),
-          ),
-        ],
-      ),
-      body: Obx(() {
-        if (_ctrl.scannedDocs.isEmpty) {
-          return Center(
+      appBar: AppBar(title: const Text('Dokumen')),
+      body: Column(
+        children: [
+          // Tombol tambah dokumen
+          Padding(
+            padding: const EdgeInsets.all(16),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.document_scanner_outlined,
-                    size: 80, color: AppColors.textSecondary),
-                const SizedBox(height: 16),
-                Text(l.scannedDocs,
-                    style: Theme.of(context).textTheme.titleMedium),
+                // Upload PDF
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: _isLoading ? null : _pickPDF,
+                    icon: const Icon(Icons.picture_as_pdf),
+                    label: const Text('Upload PDF (Ijazah, KTP, Sertifikat)'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.error,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                  ),
+                ),
                 const SizedBox(height: 8),
-                Text(l.addDocument,
-                    style: Theme.of(context).textTheme.bodyMedium),
-                const SizedBox(height: 24),
-                _buildScanButtons(l),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: _isLoading ? null : () => _pickImage(ImageSource.camera),
+                        icon: const Icon(Icons.camera_alt, size: 18),
+                        label: const Text('Kamera'),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: _isLoading ? null : () => _pickImage(ImageSource.gallery),
+                        icon: const Icon(Icons.photo_library, size: 18),
+                        label: const Text('Galeri'),
+                      ),
+                    ),
+                  ],
+                ),
+                if (_isLoading)
+                  const Padding(
+                    padding: EdgeInsets.only(top: 8),
+                    child: LinearProgressIndicator(color: AppColors.primary),
+                  ),
               ],
             ),
-          );
-        }
-        return Column(
-          children: [
-            Expanded(
-              child: ReorderableListView.builder(
-                padding: const EdgeInsets.all(16),
+          ),
+
+          // List dokumen
+          Expanded(
+            child: Obx(() {
+              if (_ctrl.scannedDocs.isEmpty) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.folder_open, size: 64, color: AppColors.textSecondary),
+                      const SizedBox(height: 12),
+                      const Text('Belum ada dokumen',
+                          style: TextStyle(color: AppColors.textSecondary)),
+                      const SizedBox(height: 8),
+                      const Text('Upload PDF atau foto dokumen di atas',
+                          style: TextStyle(color: AppColors.textSecondary, fontSize: 12),
+                          textAlign: TextAlign.center),
+                    ],
+                  ),
+                );
+              }
+
+              return ListView.builder(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
                 itemCount: _ctrl.scannedDocs.length,
-                onReorder: _ctrl.reorderDocs,
                 itemBuilder: (_, i) {
                   final doc = _ctrl.scannedDocs[i];
-                  return _DocumentCard(
-                    key: ValueKey(doc.id),
-                    doc: doc,
-                    onFilter: () => _showFilterDialog(doc),
-                    onDelete: () => _ctrl.removeScannedDoc(doc.id),
+                  final isPdf = doc.imagePath.toLowerCase().endsWith('.pdf');
+
+                  return Card(
+                    margin: const EdgeInsets.only(bottom: 10),
+                    child: ListTile(
+                      leading: Container(
+                        width: 48, height: 48,
+                        decoration: BoxDecoration(
+                          color: isPdf
+                              ? AppColors.error.withValues(alpha: 0.1)
+                              : AppColors.primary.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: isPdf
+                            ? const Icon(Icons.picture_as_pdf, color: AppColors.error)
+                            : ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: Image.file(File(doc.imagePath),
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (_, __, ___) =>
+                                        const Icon(Icons.image, color: AppColors.primary)),
+                              ),
+                      ),
+                      title: Text(doc.name,
+                          style: const TextStyle(fontWeight: FontWeight.w500)),
+                      subtitle: Text(isPdf ? 'File PDF' : 'Foto Dokumen',
+                          style: const TextStyle(fontSize: 12)),
+                      trailing: IconButton(
+                        icon: const Icon(Icons.delete_outline, color: AppColors.error),
+                        onPressed: () => _deleteDoc(doc.id),
+                      ),
+                    ),
                   );
                 },
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: _buildScanButtons(l),
-            ),
-          ],
-        );
-      }),
-    );
-  }
-
-  Widget _buildScanButtons(AppLocalizations l) {
-    return Row(
-      children: [
-        Expanded(
-          child: OutlinedButton.icon(
-            onPressed: () => _scanDocument(ImageSource.camera),
-            icon: const Icon(Icons.camera_alt),
-            label: Text(l.takePhoto),
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: ElevatedButton.icon(
-            onPressed: () => _scanDocument(ImageSource.gallery),
-            icon: const Icon(Icons.photo_library),
-            label: Text(l.chooseGallery),
-          ),
-        ),
-      ],
-    );
-  }
-
-  void _showHelp(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('Scanner Tips'),
-        content: const Text(
-            '• Take photo in good lighting\n'
-            '• Lay document flat\n'
-            '• Use crop to adjust borders\n'
-            '• B&W filter for cleaner scans\n'
-            '• Drag items to reorder'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('OK'),
+              );
+            }),
           ),
         ],
       ),
     );
-  }
-}
-
-class _DocumentCard extends StatelessWidget {
-  final ScannedDocument doc;
-  final VoidCallback onFilter;
-  final VoidCallback onDelete;
-
-  const _DocumentCard({
-    super.key,
-    required this.doc,
-    required this.onFilter,
-    required this.onDelete,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 10),
-      child: ListTile(
-        leading: ClipRRect(
-          borderRadius: BorderRadius.circular(8),
-          child: Image.file(
-            File(doc.imagePath),
-            width: 56,
-            height: 72,
-            fit: BoxFit.cover,
-            errorBuilder: (_, __, ___) =>
-                const Icon(Icons.image_not_supported),
-          ),
-        ),
-        title: Text(doc.name),
-        subtitle: Text(_filterLabel(doc.filter)),
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            IconButton(
-              icon: const Icon(Icons.filter, color: AppColors.accent),
-              onPressed: onFilter,
-            ),
-            IconButton(
-              icon: const Icon(Icons.delete, color: AppColors.error),
-              onPressed: onDelete,
-            ),
-            const Icon(Icons.drag_handle, color: AppColors.textSecondary),
-          ],
-        ),
-      ),
-    );
-  }
-
-  String _filterLabel(DocumentFilter f) {
-    switch (f) {
-      case DocumentFilter.original: return 'Original';
-      case DocumentFilter.blackAndWhite: return 'B&W';
-      case DocumentFilter.enhanced: return 'Enhanced';
-    }
-  }
-}
-
-// Extension on AppController for saving
-extension AppControllerExt on AppController {
-  void saveScannedDocs() {
-    // Trigger storage save
-    updateUserProfile(userProfile);
   }
 }

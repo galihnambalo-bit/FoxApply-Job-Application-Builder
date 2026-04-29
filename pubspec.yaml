@@ -19,8 +19,7 @@ dependencies:
 
   # Image & Camera
   image_picker: ^1.0.7
-  camera: ^0.10.5+9
-  image: ^4.1.7
+    image: ^4.1.7
   image_cropper: ^5.0.1
 
   # Storage & Files
@@ -31,26 +30,18 @@ dependencies:
   open_filex: ^4.3.4
 
   # UI
-  flutter_svg: ^2.0.10+1
-  google_fonts: ^6.2.0
-  animate_do: ^3.3.4
-  dotted_border: ^2.1.0
-  flutter_spinkit: ^5.2.1
-  photo_view: ^0.15.0
-  reorderables: ^0.6.0
-
+    google_fonts: ^6.2.0
+          
   # Localization
   intl: ^0.19.0
 
   # Ads
   google_mobile_ads: ^5.1.0
-  pdfrx: ^1.0.77
-
+  
   # Utils
   uuid: ^4.4.0
   get: ^4.6.6
-  equatable: ^2.0.5
-
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter

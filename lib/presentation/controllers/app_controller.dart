@@ -184,3 +184,12 @@ class AppController extends GetxController {
         jsonEncode(_cvProfiles.map((e) => e.toJson()).toList()));
   }
 }
+
+extension AppControllerSignature on AppController {
+  static final _useQRSignature = false.obs;
+  bool get useQRSignature => _useQRSignature.value;
+  void setUseQRSignature(bool v) {
+    _useQRSignature.value = v;
+    _storage.setRaw('use_qr_signature', v.toString());
+  }
+}

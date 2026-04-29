@@ -7,6 +7,7 @@ import 'package:uuid/uuid.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../data/models/user_profile.dart';
 import '../../controllers/app_controller.dart';
+import 'pdf_page_manager.dart';
 
 class ScannerScreen extends StatefulWidget {
   const ScannerScreen({super.key});
@@ -239,7 +240,11 @@ class _ScannerScreenState extends State<ScannerScreen> {
                       trailing: IconButton(
                         icon: const Icon(Icons.delete_outline,
                             color: AppColors.error),
-                        onPressed: () => _showDeleteDialog(context, doc.id, isId),
+                        onTap: () => Get.to(() => PdfPageManagerScreen(document: doc)),
+                      trailing: IconButton(
+                        icon: const Icon(Icons.more_vert),
+                        onPressed: () => Get.to(() => PdfPageManagerScreen(document: doc)),
+                      ),
                       ),
                     ),
                   );

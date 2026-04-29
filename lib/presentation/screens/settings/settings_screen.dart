@@ -274,3 +274,17 @@ class _SettingsTile extends StatelessWidget {
     );
   }
 }
+
+// TTD tile - tambahkan di settings
+class TTDSettingsTile extends StatelessWidget {
+  const TTDSettingsTile({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return _SettingsTile(
+      icon: Icons.draw,
+      title: 'TTD Electronic / QR',
+      subtitle: 'Atur tanda tangan di surat lamaran',
+      onTap: () => Get.toNamed('/signature'),
+    );
+  }
+}

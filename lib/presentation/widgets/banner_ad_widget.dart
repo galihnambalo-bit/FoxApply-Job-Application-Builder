@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import '../../core/utils/ad_service.dart';
+import '../../core/theme/app_theme.dart';
 
 class BannerAdWidget extends StatefulWidget {
   const BannerAdWidget({super.key});
@@ -15,24 +16,61 @@ class _BannerAdWidgetState extends State<BannerAdWidget> {
   @override
   void initState() {
     super.initState();
-    final banner = AdService.instance.createBannerAd();
-    banner.load().then((_) {
-      if (mounted) setState(() { _bannerAd = banner; _isLoaded = true; });
-    });
+    _loadBanner();
+  }
+
+  void _loadBanner() {
+    final banner = BannerAd(
+      adUnitId: AdService.instance.bannerAdUnitId,
+      size: AdSize.banner,
+      request: const AdRequest(),
+      listener: BannerAdListener(
+        onAdLoaded: (ad) {
+          if (mounted) setState(() { _bannerAd = ad as BannerAd; _isLoaded = true; });
+        },
+        onAdFailedToLoad: (ad, error) {
+          ad.dispose();
+          // Retry setelah 30 detik
+          Future.delayed(const Duration(seconds: 30), () {
+            if (mounted) _loadBanner();
+          });
+        },
+      ),
+    );
+    banner.load();
   }
 
   @override
-  void dispose() { _bannerAd?.dispose(); super.dispose(); }
+  void dispose() {
+    _bannerAd?.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    if (!_isLoaded || _bannerAd == null) return const SizedBox.shrink();
-    return SafeArea(
-      child: SizedBox(
-        width: _bannerAd!.size.width.toDouble(),
-        height: _bannerAd!.size.height.toDouble(),
-        child: AdWidget(ad: _bannerAd!),
-      ),
+    // Selalu tampilkan container - kalau iklan belum load tampilkan placeholder
+    return Container(
+      width: double.infinity,
+      height: 60,
+      color: Colors.white,
+      child: _isLoaded && _bannerAd != null
+          ? AdWidget(ad: _bannerAd!)
+          : Container(
+              decoration: BoxDecoration(
+                color: AppColors.background,
+                border: Border(top: BorderSide(color: AppColors.divider)),
+              ),
+              child: const Center(
+                child: Text(
+                  'Advertisement',
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: AppColors.textSecondary,
+                    letterSpacing: 1,
+                  ),
+                ),
+              ),
+            ),
     );
   }
 }

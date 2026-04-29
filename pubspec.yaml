@@ -19,7 +19,7 @@ dependencies:
 
   # Image & Camera
   image_picker: ^1.0.7
-    image: ^4.1.7
+  image: ^4.1.7
   image_cropper: ^5.0.1
 
   # Storage & Files

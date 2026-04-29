@@ -44,6 +44,9 @@ dependencies:
   # QR Code TTD
   qr_flutter: ^4.1.0
 
+  # Document Scanner
+  cunning_document_scanner: ^0.2.0
+
   # Utils
   uuid: ^4.4.0
   get: ^4.6.6

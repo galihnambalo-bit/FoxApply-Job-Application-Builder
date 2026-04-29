@@ -79,6 +79,7 @@ class _CoverLetterScreenState extends State<CoverLetterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         title: Text(_isId ? 'Info Lamaran' : 'Job Application Info'),
         actions: [

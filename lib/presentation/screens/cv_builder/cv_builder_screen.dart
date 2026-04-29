@@ -34,6 +34,7 @@ class _CVBuilderScreenState extends State<CVBuilderScreen>
   Widget build(BuildContext context) {
     final isId = _ctrl.locale.languageCode == 'id';
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         title: Text(isId ? 'Pembuat CV' : 'CV Builder'),
         bottom: TabBar(

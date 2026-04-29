@@ -368,6 +368,7 @@ class _EducationTab extends StatelessWidget {
           ],
         ),
       ),
+    ),
     );
   }
 }

@@ -8,10 +8,7 @@ environment:
   flutter: '>=3.10.0'
 
 dependencies:
-  flutter:
-    sdk: flutter
   flutter_localizations:
-    sdk: flutter
 
   # PDF
   pdf: ^3.10.8
@@ -34,7 +31,7 @@ dependencies:
   google_fonts: ^6.2.0
 
   # Localization
-  intl: ^0.19.0
+  intl: ^0.20.2
 
   # Ads
   google_mobile_ads: ^5.1.0
@@ -42,10 +39,8 @@ dependencies:
   # QR Code
   qr_flutter: ^4.1.0
 
-  # QR Code TTD
 
   # Document Scanner
-  cunning_document_scanner: ^1.2.3
 
   # Utils
   uuid: ^4.4.0
@@ -53,18 +48,15 @@ dependencies:
 
 dev_dependencies:
   flutter_test:
-    sdk: flutter
   flutter_lints: ^3.0.0
   flutter_launcher_icons: ^0.13.1
 
-flutter_launcher_icons:
   android: true
   ios: false
   image_path: "assets/images/icon_1024.png"
   adaptive_icon_background: "#FF6B2B"
   adaptive_icon_foreground: "assets/images/icon_foreground.png"
 
-flutter:
   uses-material-design: true
   generate: true
 
